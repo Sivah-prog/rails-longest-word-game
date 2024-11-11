@@ -1,0 +1,15 @@
+<div class="m-5 justify-content">
+  <h1>Le mot le plus long</h1>
+<p>Composez un mot à partir des lettres suivantes :</p>
+</div>
+<div class="m-5 justify-content">
+<div>
+  <%= @letters.join(" ") %>
+</div>
+<form action="/score" method="post" data-turbo="false">
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <%= hidden_field_tag :letters, @letters.join(" ") %>
+  <input type="text" name="word" placeholder="Votre mot" class="form-control mb-3" style="width: 300px; margin: 10px 0;">
+  <button type="submit" class="btn btn-primary" style="margin: 10px 0; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); border-radius: 8px;">Valider</button>
+</form>
+</div>
