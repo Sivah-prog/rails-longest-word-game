@@ -1,34 +1,30 @@
+require "open-uri"
+
 class GamesController < ApplicationController
+  VOWELS = %w(A E I O U Y)
+
   def new
-    @letters = Array.new(10) { ('A'..'Z').to_a.sample }
+    @letters = Array.new(5) { VOWELS.sample }
+    @letters += Array.new(5) { (('A'..'Z').to_a - VOWELS).sample }
+    @letters.shuffle!
   end
 
   def score
-    @word = params[:word]
     @letters = params[:letters].split
-    @valid_word = valid_word?(@word, @letters)
-    @is_english_word = english_word?(@word)
-
-    if !@valid_word
-      @result = "Sorry, but #{@word} can't be built out of #{@letters.join(", ")}"
-    elsif !@is_english_word
-      @result = "Sorry, but #{@word} is not an English word"
-    else
-      @result = "Congratulations! #{@word} is a valid English word"
-      session[:score] = (session[:score] || 0) + @word.length
-    end
+    @word = (params[:word] || "").upcase
+    @included = included?(@word, @letters)
+    @english_word = english_word?(@word)
   end
 
   private
 
-  def valid_word?(word, letters)
-    word.upcase.chars.all? { |letter| word.upcase.count(letter) <= letters.count(letter) }
+  def included?(word, letters)
+    word.chars.all? { |letter| word.count(letter) <= letters.count(letter) }
   end
 
   def english_word?(word)
-    url = "https://wagon-dictionary.herokuapp.com/#{word}"
-    response = URI.open(url).read
-    json = JSON.parse(response)
+    response = URI.open("https://dictionary.lewagon.com/#{word}")
+    json = JSON.parse(response.read)
     json['found']
   end
 end
